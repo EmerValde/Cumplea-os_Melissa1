@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feliz Cumpleaños, Melissa 💜</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===========================
+       VARIABLES Y RESET
+    =========================== */
+    :root {
+      --purple-muted:    #9b8fb0;
+      --purple-light:    #c9bfe0;
+      --purple-soft-bg:  #f0ecf7;
+      --purple-deep:     #6b5e87;
+      --purple-glow:     rgba(155, 143, 176, 0.35);
+      --cream:           #fdf9f4;
+      --warm-white:      #fefcfa;
+      --text-dark:       #2e2535;
+      --text-mid:        #5a5065;
+      --text-light:      #8f839a;
+      --gold-accent:     #c8a96e;
+      --shadow-soft:     0 8px 32px rgba(107, 94, 135, 0.15);
+      --shadow-card:     0 4px 20px rgba(107, 94, 135, 0.12);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--cream);
+      color: var(--text-dark);
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ===========================
+       PANTALLA DE INTRO
+    =========================== */
+    #intro-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #1a0f2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #intro-screen.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Canvas de fuegos artificiales (DENTRO del intro) */
+    #fw-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* Sobre */
+    .envelope-wrap {
+      position: relative;
+      width: 200px;
+      height: 140px;
+      cursor: pointer;
+      filter: drop-shadow(0 8px 30px rgba(155,143,176,0.5));
+    }
+
+    .envelope-body {
+      position: absolute;
+      inset: 0;
+      background: #2d1f4e;
+      border-radius: 6px 6px 10px 10px;
+      border: 1.5px solid #5a4580;
+    }
+
+    /* Tapa superior */
+    .envelope-flap {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 0;
+      border-left: 100px solid transparent;
+      border-right: 100px solid transparent;
+      border-top: 75px solid #3d2a65;
+      transform-origin: top center;
+      transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);
+      z-index: 2;
+    }
+
+    .envelope-wrap.open .envelope-flap {
+      transform: rotateX(180deg);
+    }
+
+    /* Triangulos decorativos laterales */
+    .envelope-body::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      border-left: 100px solid #3d2a65;
+      border-top: 65px solid transparent;
+    }
+    .envelope-body::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0;
+      border-right: 100px solid #3d2a65;
+      border-top: 65px solid transparent;
+    }
+
+    /* Carta saliendo */
+    .envelope-letter {
+      position: absolute;
+      left: 50%;
+      bottom: 55%;
+      transform: translateX(-50%) translateY(0);
+      width: 140px;
+      height: 110px;
+      background: linear-gradient(135deg, #f0ecf7, #fdf9f4);
+      border-radius: 4px;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      opacity: 0;
+      transition: transform 0.7s 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.5s 0.4s ease;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+    }
+
+    .envelope-wrap.open .envelope-letter {
+      transform: translateX(-50%) translateY(-90px);
+      opacity: 1;
+    }
+
+    /* Texto intro */
+    .intro-text {
+      text-align: center;
+      color: #c9bfe0;
+      z-index: 2;
+    }
+
+    .intro-text p {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #7a6a99;
+      margin-bottom: 0.5rem;
+    }
+
+    .intro-text h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 5vw, 1.8rem);
+      font-weight: 400;
+      font-style: italic;
+      color: #e8e0f5;
+    }
+
+    /* Botón abrir */
+    #open-btn {
+      position: relative;
+      z-index: 10;
+      background: transparent;
+      border: 1.5px solid #9b8fb0;
+      color: #c9bfe0;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 0.9rem 2.4rem;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s, transform 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    #open-btn:hover, #open-btn:active {
+      background: #9b8fb0;
+      color: #fff;
+      transform: scale(1.04);
+    }
+
+    /* Estrellas de fondo intro */
+    .stars {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle var(--d) ease-in-out infinite alternate;
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.1; transform: scale(1); }
+      to   { opacity: 0.8; transform: scale(1.4); }
+    }
+
+    /* ===========================
+       CANVAS DE PARTÍCULAS
+    =========================== */
+    #particle-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===========================
+       CABECERA HERO
+    =========================== */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 3rem 1.5rem 4rem;
+      background: radial-gradient(ellipse at 60% 30%, #e8e0f5 0%, var(--cream) 65%);
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239b8fb0' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--purple-muted);
+      border: 1px solid var(--purple-light);
+      padding: 0.4rem 1.2rem;
+      border-radius: 100px;
+      margin-bottom: 1.8rem;
+      position: relative;
+      z-index: 1;
+      animation: fadeSlideDown 1s ease both;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 9vw, 5.5rem);
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.1;
+      position: relative;
+      z-index: 1;
+      animation: fadeSlideDown 1s 0.2s ease both;
+    }
+
+    .hero h1 span {
+      color: var(--purple-deep);
+      font-style: italic;
+      display: block;
+    }
+
+    .hero-subtitle {
+      margin-top: 1.2rem;
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      color: var(--text-mid);
+      letter-spacing: 0.05em;
+      position: relative;
+      z-index: 1;
+      animation: fadeSlideDown 1s 0.4s ease both;
+    }
+
+    .hero-divider {
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--purple-muted), transparent);
+      margin: 2rem auto;
+      position: relative;
+      z-index: 1;
+      animation: fadeSlideDown 1s 0.6s ease both;
+    }
+
+    .hero-age {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(5rem, 20vw, 10rem);
+      font-weight: 700;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--purple-light);
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+      animation: fadeSlideDown 1s 0.8s ease both;
+      user-select: none;
+    }
+
+    .hero-date {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      position: relative;
+      z-index: 1;
+      animation: fadeSlideDown 1s 1s ease both;
+    }
+
+    /* ===========================
+       SECCIONES GENERALES
+    =========================== */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 4rem 1.5rem;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--purple-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.25;
+      margin-bottom: 1.2rem;
+    }
+
+    /* ===========================
+       SECCIÓN: LA FUTURA POLITÓLOGA
+    =========================== */
+    .politologa {
+      background: var(--warm-white);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .politologa::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--purple-soft-bg), transparent 70%);
+    }
+
+    .politologa::after {
+      content: '';
+      position: absolute;
+      bottom: -50px; left: -50px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--purple-soft-bg), transparent 70%);
+    }
+
+    .politologa-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .politologa-institution {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold-accent);
+      margin-bottom: 1.2rem;
+      padding: 0.3rem 1rem;
+      border: 1px solid rgba(200, 169, 110, 0.3);
+      border-radius: 100px;
+    }
+
+    .politologa-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+      font-style: italic;
+      color: var(--text-dark);
+      line-height: 1.55;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .politologa-sub {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===========================
+       GALERÍA POLAROID
+    =========================== */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    @media (min-width: 480px) {
+      .gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+      }
+    }
+
+    .polaroid {
+      background: #fff;
+      padding: 0.8rem 0.8rem 2.5rem;
+      box-shadow: 0 6px 24px rgba(107, 94, 135, 0.18), 0 1px 4px rgba(0,0,0,0.06);
+      border-radius: 2px;
+      transform: rotate(-1.5deg);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .polaroid:nth-child(2) { transform: rotate(1deg); }
+    .polaroid:nth-child(3) { transform: rotate(-0.5deg); }
+
+    .polaroid:hover {
+      transform: rotate(0deg) scale(1.04);
+      box-shadow: 0 16px 40px rgba(107, 94, 135, 0.28);
+    }
+
+    /* ── AQUÍ COLOCA TUS FOTOS ── */
+    .polaroid-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      background: var(--purple-soft-bg);
+    }
+
+    .polaroid-placeholder {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(135deg, var(--purple-soft-bg) 0%, var(--purple-light) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--purple-muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+    }
+
+    .polaroid-placeholder span { font-size: 2rem; }
+
+    .polaroid-caption {
+      text-align: center;
+      margin-top: 0.6rem;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--text-mid);
+    }
+
+    /* ===========================
+       PANEL DE CUALIDADES
+    =========================== */
+    .qualities-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .quality-card {
+      background: var(--warm-white);
+      border: 1px solid var(--purple-soft-bg);
+      border-radius: 18px;
+      padding: 0;
+      text-align: center;
+      cursor: pointer;
+      perspective: 1000px;
+      min-height: 190px;
+      position: relative;
+    }
+
+    .quality-inner {
+      position: relative;
+      width: 100%;
+      height: 190px;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .quality-card.flipped .quality-inner {
+      transform: rotateY(180deg);
+    }
+
+    .quality-front,
+    .quality-back {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      gap: 0.4rem;
+      padding: 1rem 0.8rem;
+    }
+
+    .quality-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(135deg, var(--purple-muted), var(--purple-deep));
+      border-radius: 17px;
+    }
+
+    .quality-emoji { font-size: 2.2rem; }
+
+    .quality-word {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .quality-back .quality-word { color: white; }
+
+    .quality-tap {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-light);
+    }
+
+    .quality-back .quality-desc {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.92);
+      text-align: center;
+      padding: 0 0.6rem;
+      line-height: 1.55;
+      font-style: italic;
+    }
+
+    /* ===========================
+       MENSAJE ESPECIAL (PERGAMINO)
+    =========================== */
+    .letter-section {
+      padding-top: 2rem;
+    }
+
+    .letter-wrap {
+      position: relative;
+      background: var(--warm-white);
+      border-radius: 4px 4px 4px 4px;
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .letter-top-bar {
+      height: 8px;
+      background: linear-gradient(90deg, var(--purple-light), var(--purple-muted), var(--purple-deep));
+    }
+
+    .letter-body {
+      padding: 2.5rem 2rem 3rem;
+      position: relative;
+    }
+
+    .letter-body::before {
+      content: '\201C';
+      font-family: 'Playfair Display', serif;
+      font-size: 8rem;
+      color: var(--purple-light);
+      position: absolute;
+      top: -1.5rem;
+      left: 1rem;
+      line-height: 1;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .letter-lines {
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        transparent,
+        transparent 31px,
+        rgba(155, 143, 176, 0.1) 31px,
+        rgba(155, 143, 176, 0.1) 32px
+      );
+      pointer-events: none;
+    }
+
+    .letter-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1rem, 3.2vw, 1.15rem);
+      line-height: 2;
+      color: var(--text-dark);
+      font-style: italic;
+      position: relative;
+      z-index: 1;
+    }
+
+    .letter-signature {
+      margin-top: 2rem;
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      letter-spacing: 0.1em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .letter-signature strong {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--purple-deep);
+      font-weight: 400;
+    }
+
+    .letter-bottom-bar {
+      height: 8px;
+      background: linear-gradient(90deg, var(--purple-deep), var(--purple-muted), var(--purple-light));
+    }
+
+    /* ===========================
+       PIE DE PÁGINA / CONTADOR
+    =========================== */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 3rem 1.5rem 4rem;
+      background: var(--text-dark);
+      color: var(--purple-light);
+    }
+
+    .footer-date {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 6vw, 3rem);
+      font-weight: 700;
+      color: var(--warm-white);
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-sub {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--purple-muted);
+      margin-bottom: 2rem;
+    }
+
+    .footer-message-wrap {
+      margin: 1.5rem auto 2rem;
+      max-width: 320px;
+      padding: 2rem 1.5rem;
+      border: 1px solid rgba(155, 143, 176, 0.2);
+      border-radius: 20px;
+      background: rgba(155, 143, 176, 0.07);
+    }
+
+    .footer-big {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--purple-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .footer-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 7vw, 3rem);
+      font-style: italic;
+      color: var(--warm-white);
+      line-height: 1.1;
+      margin-bottom: 1.2rem;
+    }
+
+    .footer-poem {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--purple-light);
+      line-height: 1.9;
+    }
+
+    .footer-love {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--purple-muted);
+    }
+
+    /* ===========================
+       ANIMACIONES
+    =========================== */
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    /* Fade-in al hacer scroll */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===========================
+       SCROLL ARROW
+    =========================== */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      animation: bounceDown 2s infinite;
+    }
+
+    .scroll-hint span {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-light);
+    }
+
+    .scroll-hint svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--purple-muted);
+    }
+
+    @keyframes bounceDown {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ===========================
+       SEPARADOR DECORATIVO
+    =========================== */
+    .divider {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .divider-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--purple-light), transparent);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================
+       PANTALLA DE ENTRADA (SOBRE + FUEGOS)
+  ============================= -->
+  <div id="intro-screen">
+    <div class="stars" id="stars-bg"></div>
+    <canvas id="fw-canvas"></canvas>
+    <div class="intro-text" style="z-index:2">
+      <p>✦ un regalo especial para ti ✦</p>
+      <h2>Tienes un mensaje, Melissa</h2>
+    </div>
+    <div class="envelope-wrap" id="envelope" onclick="openEnvelope()">
+      <div class="envelope-body"></div>
+      <div class="envelope-flap"></div>
+      <div class="envelope-letter">💜</div>
+    </div>
+    <button id="open-btn" onclick="openEnvelope()">Abrir regalo 🎁</button>
+  </div>
+
+  <!-- Canvas para corazones y pétalos -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- ============================
+       SECCIÓN 1: CABECERA HERO
+  ============================= -->
+  <header class="hero">
+    <div class="hero-badge">✦ 18 de abril de 2026 ✦</div>
+    <h1>
+      ¡Feliz Cumpleaños,
+      <span>Melissa!</span>
+    </h1>
+    <p class="hero-subtitle">Hoy el mundo celebra que existes 💜</p>
+    <div class="hero-divider"></div>
+    <div class="hero-age">19</div>
+    <p class="hero-date">2007 — 2026</p>
+
+    <div class="scroll-hint">
+      <span>scroll</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+    </div>
+  </header>
+
+  <!-- ============================
+       SECCIÓN 2: LA FUTURA POLITÓLOGA
+  ============================= -->
+  <section>
+    <div class="fade-in">
+      <p class="section-label">✦ Orgullo</p>
+      <h2 class="section-title">La Futura Politóloga</h2>
+    </div>
+    <div class="politologa fade-in">
+      <span class="politologa-icon">⚖️</span>
+      <div class="politologa-institution">UNT · Ciencia Política y Gobernabilidad</div>
+      <p class="politologa-quote">
+        "De la UNT para el mundo. Orgulloso de tu camino en Ciencia Política y Gobernabilidad."
+      </p>
+      <p class="politologa-sub">
+        Tu esfuerzo y dedicación construyen un futuro más justo. 🌎
+      </p>
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div></div>
+
+  <!-- ============================
+       SECCIÓN 3: GALERÍA POLAROID
+  ============================= -->
+  <section>
+    <p class="section-label fade-in">✦ Momentos</p>
+    <h2 class="section-title fade-in">Nuestra Galería</h2>
+
+    <div class="gallery-grid">
+
+      <!-- FOTO 1 — Reemplaza el bloque <div class="polaroid-placeholder">
+           con: <img class="polaroid-img" src="TU_URL_FOTO_1.jpg" alt="Foto 1"> -->
+      <div class="polaroid fade-in">
+        <div class="polaroid-placeholder">
+          <span><img src="img/melissa.png" alt=""></span>
+          <!-- ↑↑↑ AQUÍ VA LA FOTO 1 ↑↑↑ -->
+          foto 1
+        </div>
+        <p class="polaroid-caption">Melissa 💜</p>
+      </div>
+
+      <!-- FOTO 2 — Reemplaza el bloque <div class="polaroid-placeholder">
+           con: <img class="polaroid-img" src="TU_URL_FOTO_2.jpg" alt="Foto 2"> -->
+      <div class="polaroid fade-in">
+        <div class="polaroid-placeholder">
+          <span><img src="img/siempre_sonrrintes.png" alt=""></span>
+          <!-- ↑↑↑ AQUÍ VA LA FOTO 2 ↑↑↑ -->
+        
+        </div>
+        <p class="polaroid-caption">Siempre sonriendo ✨</p>
+      </div>
+
+      <!-- FOTO 3 — Reemplaza el bloque <div class="polaroid-placeholder">
+           con: <img class="polaroid-img" src="TU_URL_FOTO_3.jpg" alt="Foto 3"> -->
+      <div class="polaroid fade-in">
+        <div class="polaroid-placeholder">
+          <span><img src="img/meli.png" alt=""></span>
+        
+        
+        </div>
+        <p class="polaroid-caption">Bella 🌸</p>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div></div>
+
+  <!-- ============================
+       SECCIÓN 4: PANEL DE CUALIDADES
+  ============================= -->
+  <section>
+    <p class="section-label fade-in">✦ Así eres tú</p>
+    <h2 class="section-title fade-in">Lo que me enamora de ti</h2>
+
+    <div class="qualities-grid">
+
+      <div class="quality-card fade-in" onclick="this.classList.toggle('flipped')">
+        <div class="quality-inner">
+          <div class="quality-front">
+            <span class="quality-emoji">🌸</span>
+            <span class="quality-word">Linda</span>
+            <span class="quality-tap">tócame</span>
+          </div>
+          <div class="quality-back">
+            <span class="quality-emoji">🌸</span>
+            <span class="quality-word">Linda</span>
+            <span class="quality-desc">Tu sonrisa es lo primero que noté de ti… y sigue siendo lo que más me roba el aliento.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="quality-card fade-in" onclick="this.classList.toggle('flipped')">
+        <div class="quality-inner">
+          <div class="quality-front">
+            <span class="quality-emoji">🤍</span>
+            <span class="quality-word">Amable</span>
+            <span class="quality-tap">tócame</span>
+          </div>
+          <div class="quality-back">
+            <span class="quality-emoji">🤍</span>
+            <span class="quality-word">Amable</span>
+            <span class="quality-desc">Tratas a todos con tanto cariño que el mundo es mejor solo por tenerte en él.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="quality-card fade-in" onclick="this.classList.toggle('flipped')">
+        <div class="quality-inner">
+          <div class="quality-front">
+            <span class="quality-emoji">☀️</span>
+            <span class="quality-word">Alegre</span>
+            <span class="quality-tap">tócame</span>
+          </div>
+          <div class="quality-back">
+            <span class="quality-emoji">☀️</span>
+            <span class="quality-word">Alegre</span>
+            <span class="quality-desc">Tu risa es mi canción favorita. Nunca me canso de escucharla, Meli. 🎶</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="quality-card fade-in" onclick="this.classList.toggle('flipped')">
+        <div class="quality-inner">
+          <div class="quality-front">
+            <span class="quality-emoji">💜</span>
+            <span class="quality-word">Cariñosa</span>
+            <span class="quality-tap">tócame</span>
+          </div>
+          <div class="quality-back">
+            <span class="quality-emoji">💜</span>
+            <span class="quality-word">Cariñosa</span>
+            <span class="quality-desc">La forma en que quieres a la gente me enseña a amar mejor cada día. Gracias por eso.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div></div>
+
+  <!-- ============================
+       SECCIÓN 5: MENSAJE ESPECIAL
+  ============================= -->
+  <section class="letter-section">
+    <p class="section-label fade-in">✦ Para ti</p>
+    <h2 class="section-title fade-in">Un Mensaje del Corazón</h2>
+
+    <div class="letter-wrap fade-in">
+      <div class="letter-top-bar"></div>
+      <div class="letter-body">
+        <div class="letter-lines"></div>
+        <p class="letter-text">
+          Desde el 2007 el mundo es más brillante porque tú estás en él.
+          Mañana 18 de abril celebramos tu vida, tu esfuerzo en la universidad
+          y el enorme corazón que tienes.
+          <br><br>
+          ¡Te amo!
+        </p>
+        <div class="letter-signature">
+          con todo mi amor,
+          <strong>Siempre tuyo 💜</strong>
+        </div>
+      </div>
+      <div class="letter-bottom-bar"></div>
+    </div>
+  </section>
+
+  <!-- ============================
+       PIE DE PÁGINA: CONTADOR
+  ============================= -->
+  <footer>
+    <p class="footer-date">18 de Abril, 2026</p>
+    <p class="footer-sub">¡Hoy es tu día, Melissa! 🎂</p>
+
+    <div class="footer-message-wrap">
+      <p class="footer-big">Feliz cumpleaños,</p>
+      <p class="footer-name">Melissa 💜</p>
+      <p class="footer-poem">
+        Tú eres lo primero<br>
+        en lo que pienso hoy y siempre.
+      </p>
+    </div>
+
+    <p class="footer-love">"19 años de magia pura." 💜</p>
+  </footer>
+
+  <!-- ============================
+       JAVASCRIPT
+  ============================= -->
+  <script>
+    // ════════════════════════════════════════
+    // 0. INTRO: SOBRE + FUEGOS ARTIFICIALES
+    // ════════════════════════════════════════
+
+    // — Estrellas de fondo —
+    const starsContainer = document.getElementById('stars-bg');
+    for (let i = 0; i < 80; i++) {
+      const s = document.createElement('div');
+      s.classList.add('star');
+      const size = Math.random() * 2.5 + 0.5;
+      s.style.cssText = `
+        width:${size}px; height:${size}px;
+        top:${Math.random()*100}%; left:${Math.random()*100}%;
+        --d:${(Math.random()*2+1).toFixed(1)}s;
+        animation-delay:${(Math.random()*3).toFixed(1)}s;
+      `;
+      starsContainer.appendChild(s);
+    }
+
+    // — Canvas fuegos artificiales —
+    const fwCanvas = document.getElementById('fw-canvas');
+    const fwCtx   = fwCanvas.getContext('2d');
+    let fwRunning  = false;
+    let fwRafId    = null;
+
+    function resizeFW() {
+      fwCanvas.width  = window.innerWidth;
+      fwCanvas.height = window.innerHeight;
+    }
+    resizeFW();
+    window.addEventListener('resize', resizeFW);
+
+    // Colores temáticos (violeta + dorado + rosa)
+    const FW_COLORS = [
+      '#c9bfe0','#9b8fb0','#6b5e87',
+      '#e8c4f0','#f4d4f8','#c8a96e',
+      '#f9a8d4','#ffffff','#d8b4fe'
+    ];
+
+    class FWParticle {
+      constructor(x, y, color) {
+        this.x = x; this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 5 + 1.5;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.015 + 0.008;
+        this.size  = Math.random() * 3 + 1;
+        this.gravity = 0.08;
+        this.trail = [];
+      }
+      update() {
+        this.trail.push({x: this.x, y: this.y, a: this.alpha});
+        if (this.trail.length > 8) this.trail.shift();
+        this.vy += this.gravity;
+        this.x  += this.vx;
+        this.y  += this.vy;
+        this.vx *= 0.98;
+        this.alpha -= this.decay;
+      }
+      draw(ctx) {
+        // Estela
+        for (let i = 0; i < this.trail.length; i++) {
+          const t = this.trail[i];
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, this.size * 0.4, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.globalAlpha = t.a * (i / this.trail.length) * 0.4;
+          ctx.fill();
+        }
+        // Partícula
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.alpha;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    class FWRocket {
+      constructor() { this.reset(); }
+      reset() {
+        this.x     = fwCanvas.width * (0.2 + Math.random() * 0.6);
+        this.y     = fwCanvas.height;
+        this.vy    = -(Math.random() * 8 + 10);
+        this.color = FW_COLORS[Math.floor(Math.random() * FW_COLORS.length)];
+        this.targetY = fwCanvas.height * (0.1 + Math.random() * 0.45);
+        this.done  = false;
+        this.trail = [];
+      }
+      update(particles) {
+        this.trail.push({x: this.x, y: this.y});
+        if (this.trail.length > 12) this.trail.shift();
+        this.y += this.vy;
+        this.vy += 0.25; // gravedad leve subiendo
+        if (this.y <= this.targetY || this.vy >= 0) {
+          this.explode(particles);
+          this.done = true;
+        }
+      }
+      explode(particles) {
+        const count = 80 + Math.floor(Math.random() * 60);
+        for (let i = 0; i < count; i++) {
+          particles.push(new FWParticle(this.x, this.y, this.color));
+        }
+        // Segunda capa con color diferente
+        const col2 = FW_COLORS[Math.floor(Math.random() * FW_COLORS.length)];
+        for (let i = 0; i < 30; i++) {
+          particles.push(new FWParticle(this.x, this.y, col2));
+        }
+      }
+      draw(ctx) {
+        for (let i = 0; i < this.trail.length; i++) {
+          const t = this.trail[i];
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.globalAlpha = (i / this.trail.length) * 0.8;
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    let fwParticles = [];
+    let fwRockets   = [];
+    let fwLastLaunch = 0;
+
+    function fwLoop(ts) {
+      if (!fwRunning) return;
+
+      // Fondo semitransparente (efecto trail)
+      fwCtx.fillStyle = 'rgba(26, 15, 46, 0.18)';
+      fwCtx.fillRect(0, 0, fwCanvas.width, fwCanvas.height);
+
+      // Lanzar cohete cada ~700ms
+      if (ts - fwLastLaunch > 700) {
+        fwRockets.push(new FWRocket());
+        fwLastLaunch = ts;
+      }
+
+      // Actualizar cohetes
+      fwRockets.forEach(r => { r.update(fwParticles); r.draw(fwCtx); });
+      fwRockets = fwRockets.filter(r => !r.done);
+
+      // Actualizar partículas
+      fwParticles.forEach(p => { p.update(); p.draw(fwCtx); });
+      fwParticles = fwParticles.filter(p => p.alpha > 0.01);
+
+      fwRafId = requestAnimationFrame(fwLoop);
+    }
+
+    function startFireworks() {
+      fwRunning = true;
+      requestAnimationFrame(fwLoop);
+    }
+
+    function stopFireworks() {
+      fwRunning = false;
+      if (fwRafId) cancelAnimationFrame(fwRafId);
+      fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+    }
+
+    // Inicia fuegos al cargar (efecto ambiental leve)
+    startFireworks();
+
+    // — Lógica de abrir el sobre —
+    let envelopeOpened = false;
+
+    function openEnvelope() {
+      if (envelopeOpened) return;
+      envelopeOpened = true;
+
+      // Animar sobre
+      document.getElementById('envelope').classList.add('open');
+      document.getElementById('open-btn').style.opacity = '0';
+      document.getElementById('open-btn').style.pointerEvents = 'none';
+
+      // Fuegos más intensos por 3 segundos
+      fwLastLaunch = -9999;
+
+      // Después de 2.5s, hacer fade out del intro y mostrar la página
+      setTimeout(() => {
+        stopFireworks();
+        document.getElementById('intro-screen').classList.add('hide');
+        // Desbloquear scroll
+        document.body.style.overflow = '';
+      }, 2800);
+    }
+
+    // Bloquear scroll mientras el intro está activo
+    document.body.style.overflow = 'hidden';
+
+    // ────────────────────────────────────────
+    // 1. PARTÍCULAS (corazones y pétalos)
+    // ────────────────────────────────────────
+    const canvas = document.getElementById('particle-canvas');
+    const ctx    = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const SYMBOLS = ['💜', '🌸', '✦', '♡', '·'];
+    const particles = [];
+
+    class Particle {
+      constructor() { this.reset(true); }
+
+      reset(init = false) {
+        this.x     = Math.random() * canvas.width;
+        this.y     = init ? Math.random() * canvas.height : -20;
+        this.sym   = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+        this.size  = Math.random() * 14 + 8;
+        this.speed = Math.random() * 0.8 + 0.3;
+        this.drift = (Math.random() - 0.5) * 0.6;
+        this.alpha = Math.random() * 0.5 + 0.2;
+        this.rot   = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.02;
+      }
+
+      update() {
+        this.y   += this.speed;
+        this.x   += this.drift;
+        this.rot += this.rotSpeed;
+        if (this.y > canvas.height + 30) this.reset();
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rot);
+        ctx.font = `${this.size}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.sym, 0, 0);
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < 45; i++) particles.push(new Particle());
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // ────────────────────────────────────────
+    // 2. SCROLL FADE-IN
+    // ────────────────────────────────────────
+    const fadeEls = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    fadeEls.forEach(el => observer.observe(el));
+
+    // fin
+  </script>
+</body>
+</html>
