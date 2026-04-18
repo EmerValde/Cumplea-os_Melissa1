@@ -450,6 +450,26 @@
       }
     }
 
+    @media (min-width: 768px) {
+      .gallery-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+      }
+      .polaroid {
+        padding: 1rem 1rem 3rem;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .gallery-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 2rem;
+      }
+      .polaroid {
+        padding: 1.2rem 1.2rem 3.5rem;
+      }
+    }
+
     .polaroid {
       background: #fff;
       padding: 0.8rem 0.8rem 2.5rem;
@@ -475,6 +495,12 @@
       object-fit: cover;
       display: block;
       background: var(--purple-soft-bg);
+    }
+
+    @media (max-width: 479px) {
+      .polaroid-img {
+        aspect-ratio: 3 / 4;
+      }
     }
 
     .polaroid-placeholder {
@@ -891,33 +917,21 @@
       <!-- FOTO 1 — Reemplaza el bloque <div class="polaroid-placeholder">
            con: <img class="polaroid-img" src="TU_URL_FOTO_1.jpg" alt="Foto 1"> -->
       <div class="polaroid fade-in">
-        <div class="polaroid-placeholder">
-          <span><img src="img/melissa.png" alt=""></span>
-          <!-- ↑↑↑ AQUÍ VA LA FOTO 1 ↑↑↑ -->
-          foto 1
-        </div>
+        <img class="polaroid-img" src="img/melissa.png" alt="Foto 1">
         <p class="polaroid-caption">Melissa 💜</p>
       </div>
 
       <!-- FOTO 2 — Reemplaza el bloque <div class="polaroid-placeholder">
            con: <img class="polaroid-img" src="TU_URL_FOTO_2.jpg" alt="Foto 2"> -->
       <div class="polaroid fade-in">
-        <div class="polaroid-placeholder">
-          <span><img src="img/siempre_sonrrintes.png" alt=""></span>
-          <!-- ↑↑↑ AQUÍ VA LA FOTO 2 ↑↑↑ -->
-        
-        </div>
+        <img class="polaroid-img" src="img/siempre_sonrrintes.png" alt="Foto 2">
         <p class="polaroid-caption">Siempre sonriendo ✨</p>
       </div>
 
       <!-- FOTO 3 — Reemplaza el bloque <div class="polaroid-placeholder">
            con: <img class="polaroid-img" src="TU_URL_FOTO_3.jpg" alt="Foto 3"> -->
       <div class="polaroid fade-in">
-        <div class="polaroid-placeholder">
-          <span><img src="img/meli.png" alt=""></span>
-        
-        
-        </div>
+        <img class="polaroid-img" src="img/meli.png" alt="Foto 3">
         <p class="polaroid-caption">Bella 🌸</p>
       </div>
 
